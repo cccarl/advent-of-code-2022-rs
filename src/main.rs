@@ -1,5 +1,6 @@
 use std::env;
 use std::fs;
+use std::io::Write;
 mod day_manager;
 
 fn main() {
@@ -16,5 +17,16 @@ fn main() {
 
     day_manager::execute_day(ex);
 
+    for i in 5..26 {
+        let mut file = fs::File::create(format!("src/day_manager/day{}.rs", i)).unwrap();
+
+        let contents_iter = format!("use std::fs;\n\npub fn day_{}_main() {{\n\n}}\n", i);
+
+        let Ok(_) = file.write(contents_iter.as_bytes()) else {
+            println!("Could not write to file.");
+            return;
+        };
+    }
+    
 
 }
