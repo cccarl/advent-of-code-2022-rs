@@ -6,6 +6,7 @@ struct Cleanup {
 }
 
 pub fn day_4_main() {
+    // https://adventofcode.com/2022/day/3
     let file_path = "inputs/day_4_cleanup.txt";
     let cleanup_raw = fs::read_to_string(file_path).expect("Could not read or find file");
 

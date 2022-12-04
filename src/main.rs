@@ -17,6 +17,7 @@ fn main() {
 
     day_manager::execute_day(ex);
 
+    
     // create template files for each day
     for i in 5..26 {
         let mut file = fs::File::create(format!("src/day_manager/day{}.rs", i)).unwrap();
@@ -26,6 +27,7 @@ fn main() {
                 // https://adventofcode.com/2022/day/{}\n    \
                 let file_path = \"inputs/placeholder.txt\";\n    \
                 let input = fs::read_to_string(file_path).expect(\"Could not read or find file.\");\n    \
+                println!(\"\\n{{}}\\n\", input);\n    \
                 todo!();\n\
             }}\n\
             ", i, i);
@@ -37,5 +39,3 @@ fn main() {
     }
 
 }
-
-

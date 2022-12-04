@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 
 pub fn day_3_main() {
-    //https://adventofcode.com/2022/day/3
+    // https://adventofcode.com/2022/day/3
 
     /*
     -runsack with items in 2 compartments
@@ -27,9 +27,13 @@ pub fn day_3_main() {
     let file_path = "inputs/day_3_rucksacks.txt";
     let sacks_raw = fs::read_to_string(file_path).expect("Could not read or find file");
 
-    //run_part_1(sacks_raw);
+    run_part_1(sacks_raw);
 
+    // lazy fix to satisfy the borrow checker for the 2nd func
+    let file_path = "inputs/day_3_rucksacks.txt";
+    let sacks_raw = fs::read_to_string(file_path).expect("Could not read or find file");
     run_part_2(sacks_raw);
+
 }
 
 fn get_priority_hashmap() -> HashMap<char, usize> {
