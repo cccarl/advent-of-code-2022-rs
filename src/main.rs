@@ -17,16 +17,25 @@ fn main() {
 
     day_manager::execute_day(ex);
 
+    // create template files for each day
     for i in 5..26 {
         let mut file = fs::File::create(format!("src/day_manager/day{}.rs", i)).unwrap();
 
-        let contents_iter = format!("use std::fs;\n\npub fn day_{}_main() {{\n\n}}\n", i);
+        let contents_iter = format!("use std::fs;\n\n\
+            pub fn day_{}_main() {{\n    \
+                // https://adventofcode.com/2022/day/{}\n    \
+                let file_path = \"inputs/placeholder.txt\";\n    \
+                let input = fs::read_to_string(file_path).expect(\"Could not read or find file.\");\n    \
+                todo!();\n\
+            }}\n\
+            ", i, i);
 
         let Ok(_) = file.write(contents_iter.as_bytes()) else {
             println!("Could not write to file.");
             return;
         };
     }
-    
 
 }
+
+
