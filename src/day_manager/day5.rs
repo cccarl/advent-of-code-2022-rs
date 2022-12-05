@@ -51,7 +51,7 @@ pub fn day_5_main() {
                         }
                     }
                 }
-                None => println!("Tried to add data to a stack from non existing text. How did this happen?"),
+                None => println!("Out of range of line data while saving stack data. How did this happen?")
             }
         }
     }
@@ -68,7 +68,7 @@ pub fn day_5_main() {
             continue;
         }
 
-        // split sring by space, then filter every string slice that's not a number, the pattern is always the same, so...
+        // split string by space, then filter every string slice that's not a number, the pattern is always the same, so...
         let instruction_parsed: Vec<i32> = line
             .split(' ')
             .filter(|x| x.chars().all(|y| y.is_numeric()))
@@ -89,7 +89,7 @@ pub fn day_5_main() {
 
             match crate_item {
                 Some(num) => stacks[instruction.to as usize - 1 as usize].push_back(num),
-                None => println!("Instructions are wrong, tried to move more crates in an empty stack.")
+                None => println!("Instructions are wrong, tried to move crates from an empty stack.")
             }
         }
         */
