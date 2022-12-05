@@ -1,10 +1,10 @@
-use std::{fs, collections::VecDeque};
+use std::{collections::VecDeque, fs};
 
 #[derive(Debug)]
 struct Instruction {
     quantity: i32,
     from: i32,
-    to: i32
+    to: i32,
 }
 
 pub fn day_5_main() {
@@ -12,7 +12,6 @@ pub fn day_5_main() {
     let file_path = "inputs/day_5_cranes.txt";
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     //println!("\n{}\n", input);
-    
 
     // 1st: put the stacks into vecs, the width is consistent so...
     let stacks_num: usize = (input.lines().next().unwrap().len() + 1) / 4;
@@ -24,7 +23,6 @@ pub fn day_5_main() {
     // go stack by stack saving the contents of them
     for curr_stack in 0..stacks_num {
         for line in input.lines() {
-
             // jump to next stack once the stack is done, indicated by an empty line
             if line.is_empty() {
                 break;
@@ -41,7 +39,7 @@ pub fn day_5_main() {
             for _ in 0..(curr_stack * 4) {
                 line_iter.next();
             }
-            
+
             // save data in vec
             match line_iter.next() {
                 Some(c) => {
@@ -53,9 +51,8 @@ pub fn day_5_main() {
                         }
                     }
                 }
-                None => println!("How did this happen?")
+                None => println!("Tried to add data to a stack from non existing text. How did this happen?"),
             }
-
         }
     }
 
@@ -67,28 +64,25 @@ pub fn day_5_main() {
     // process instructions
     for line in input.lines() {
         // ignore lines that do not contain instruction keywords
-        if !line.contains("move") || !line.contains("from") || !line.contains("to"){
+        if !line.contains("move") || !line.contains("from") || !line.contains("to") {
             continue;
         }
 
         // split sring by space, then filter every string slice that's not a number, the pattern is always the same, so...
-        let instruction_parsed: Vec<i32> = line.split(' ')
-                                                .filter(|x| 
-                                                    x.chars()
-                                                        .all(
-                                                            |y| 
-                                                                y.is_numeric()) )
-                                                .map(|z| z.parse().unwrap())
-                                                .collect();
-        
+        let instruction_parsed: Vec<i32> = line
+            .split(' ')
+            .filter(|x| x.chars().all(|y| y.is_numeric()))
+            .map(|z| z.parse().unwrap())
+            .collect();
 
         let instruction = Instruction {
             quantity: instruction_parsed[0],
             from: instruction_parsed[1],
-            to: instruction_parsed[2]
+            to: instruction_parsed[2],
         };
         println!("INSTRUCTION PARSED: {:?}", instruction);
 
+        /* for part 1
         // move crate x number of times
         for _ in 0..instruction.quantity {
             let crate_item =  stacks[instruction.from as usize - 1 as usize].pop_back();
@@ -98,11 +92,28 @@ pub fn day_5_main() {
                 None => println!("Instructions are wrong, tried to move more crates in an empty stack.")
             }
         }
+        */
+
+        // for part 2
+        // we make an aux vector to push the contents twice and keep the correct order
+        let mut auxvec: VecDeque<char> = VecDeque::new();
+        for _ in 0..instruction.quantity {
+            let crate_item = stacks[instruction.from as usize - 1 as usize].pop_back();
+
+            match crate_item {
+                Some(num) => auxvec.push_front(num),
+                None => {
+                    println!("Instructions are wrong, tried to move crates in an empty stack.")
+                }
+            }
+        }
+
+        for item in auxvec {
+            stacks[instruction.to as usize - 1 as usize].push_back(item);
+        }
 
         for stack in &stacks {
             println!("{:?}", stack);
         }
-        
     }
-
 }
