@@ -33,7 +33,6 @@ pub fn day_3_main() {
     let file_path = "inputs/day_3_rucksacks.txt";
     let sacks_raw = fs::read_to_string(file_path).expect("Could not read or find file");
     run_part_2(sacks_raw);
-
 }
 
 fn get_priority_hashmap() -> HashMap<char, usize> {

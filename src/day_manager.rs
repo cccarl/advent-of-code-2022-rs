@@ -25,7 +25,7 @@ mod day24;
 mod day25;
 
 pub fn execute_day(day: u32) {
-    println!("Running day: {}", day);
+    println!("\n***Running day: {}***\n", day);
 
     match day {
         1 => day1::day_1_main(),
