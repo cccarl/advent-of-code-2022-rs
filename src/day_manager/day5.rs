@@ -51,7 +51,9 @@ pub fn day_5_main() {
                         }
                     }
                 }
-                None => println!("Out of range of line data while saving stack data. How did this happen?")
+                None => println!(
+                    "Out of range of line data while saving stack data. How did this happen?"
+                ),
             }
         }
     }
