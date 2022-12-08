@@ -1,5 +1,5 @@
-use std::fs;
 use slab_tree::*;
+use std::fs;
 
 #[derive(Debug)]
 struct File {
@@ -34,7 +34,7 @@ pub fn day_7_main() {
     let file_path = "inputs/day_7_demo.txt";
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     //println!("\n{}\n", input);
-    
+
     // oof this is getting hard
     // parse the input to get a file system overview, and add up all the directories that weight at most 10.000
 
@@ -47,7 +47,7 @@ pub fn day_7_main() {
     // wait that's not how it works, rework:
     // ROOT NODE -> struct called folder that contains the folder name and the files list, which is a vec of file struct, this good?
 
-    // TOMORROW: 
+    // TOMORROW:
     // test this tree model
     // decide how to parse the input: read commands and save them, and execute them later, or read them execute them jit
 
@@ -55,14 +55,26 @@ pub fn day_7_main() {
 
     let root_folder_test = Folder {
         name: "/".to_string(),
-        files: vec![File { name: "poopsock.img".to_string(), size: 100 }]
+        files: vec![File {
+            name: "poopsock.img".to_string(),
+            size: 100,
+        }],
     };
 
     let mut tree = TreeBuilder::new().with_root(root_folder_test).build();
 
     let folder_2 = Folder {
         name: "I am in level 2".to_string(),
-        files: vec![File { name: "more_poop.img".to_string(), size: 1000}, File {name: "A folder".to_string(), size: 500}]
+        files: vec![
+            File {
+                name: "more_poop.img".to_string(),
+                size: 1000,
+            },
+            File {
+                name: "A folder".to_string(),
+                size: 500,
+            },
+        ],
     };
 
     let root_id = tree.root_id().expect("No root in this tree");
@@ -85,15 +97,17 @@ pub fn day_7_main() {
     // parse complete B), only question is if cwd should contain the cwd AFTER the command or BEFORE
 
     let filesys_tree = build_file_sys_tree(command_history);
-
-
 }
 
-fn parse_command_history (input: String) -> Vec<CommandInput> {
+fn parse_command_history(input: String) -> Vec<CommandInput> {
     let mut commands_history: Vec<CommandInput> = vec![];
     let mut cwd: Vec<String> = vec![]; // starts from root regardless of the first command
-    // separate the line in $, with this each line shuould be a different command
-    for line in input.split("$ ").map(|str| str.strip_suffix('\n').unwrap_or(str)).collect::<Vec<&str>>() {
+                                       // separate the line in $, with this each line shuould be a different command
+    for line in input
+        .split("$ ")
+        .map(|str| str.strip_suffix('\n').unwrap_or(str))
+        .collect::<Vec<&str>>()
+    {
         println!("line is: {line}");
 
         // get the command from the line
@@ -105,11 +119,17 @@ fn parse_command_history (input: String) -> Vec<CommandInput> {
 
         // get the command from the line, supports only 1 but that's the relevant one for cd in this exercise
         let (parameter, output) = match command {
-            ConsoleCommand::Cd => {
-                (Some(line.split(&['\n', '\r']).collect::<Vec<&str>>()[0].split(' ').collect::<Vec<&str>>()[1].to_string()), None)
-            },
+            ConsoleCommand::Cd => (
+                Some(
+                    line.split(&['\n', '\r']).collect::<Vec<&str>>()[0]
+                        .split(' ')
+                        .collect::<Vec<&str>>()[1]
+                        .to_string(),
+                ),
+                None,
+            ),
             ConsoleCommand::Ls => (None, Some(line.split_once('\n').unwrap().1.to_string())),
-            ConsoleCommand::Unknown => (None, None)
+            ConsoleCommand::Unknown => (None, None),
         };
 
         // save the command to the vec history
@@ -123,21 +143,19 @@ fn parse_command_history (input: String) -> Vec<CommandInput> {
             println!("Saving new command:{:?}", command_detailed);
             commands_history.push(command_detailed);
         }
-        
+
         // apply the new cwd after savind the command
         if command == ConsoleCommand::Cd {
             match parameter.clone() {
-                Some(p) => {
-                    match &p[..] {
-                        "/"  => {
-                            cwd = vec![];
-                        }
-                        ".." => {
-                            cwd.pop().expect("Tried to 'cwd ..' in root!");
-                        },
-                        _    => {
-                            cwd.push(p.to_string());
-                        }
+                Some(p) => match &p[..] {
+                    "/" => {
+                        cwd = vec![];
+                    }
+                    ".." => {
+                        cwd.pop().expect("Tried to 'cwd ..' in root!");
+                    }
+                    _ => {
+                        cwd.push(p.to_string());
                     }
                 },
                 None => println!("No parameter provided for 'cd'."),
@@ -151,19 +169,18 @@ fn parse_command_history (input: String) -> Vec<CommandInput> {
 }
 
 fn build_file_sys_tree(commands: Vec<CommandInput>) -> Tree<Folder> {
-
     // time to build the tree
     let root_folder = Folder {
         name: "/".to_string(),
-        files: vec![]
+        files: vec![],
     };
 
     println!("File system build start...");
     let mut file_sys = TreeBuilder::new().with_root(root_folder).build();
     for command in commands {
         println!("Running: {:?}", command);
-        
-/* 
+
+        /*
         // i will enter the tree from its root for every command which isn't very efficient but i've never worked with trees before so i'll keep it simple
         for folder in command.cwd {
 
@@ -184,15 +201,19 @@ fn build_file_sys_tree(commands: Vec<CommandInput>) -> Tree<Folder> {
                 println!("Could not find folder: {}", folder);
 
             }
-            
+
         }
         */
 
         // jump to cwd, we assume that 'cd' and 'ls' create the appropiate node
         let mut curr_node: NodeId = file_sys.root_id().expect("root doesn't exist");
         for folder in command.cwd {
-            for child_folder in file_sys.root_mut().expect("root doesn't exist").as_ref().children(){ 
-
+            for child_folder in file_sys
+                .root_mut()
+                .expect("root doesn't exist")
+                .as_ref()
+                .children()
+            {
                 println!("searching for: {:?}", folder);
 
                 if child_folder.data().name == folder {
@@ -200,14 +221,11 @@ fn build_file_sys_tree(commands: Vec<CommandInput>) -> Tree<Folder> {
                     curr_node = child_folder.node_id();
                     break;
                 }
-
             }
-
-        };
+        }
 
         match command.command {
             ConsoleCommand::Cd => {
-                
                 // return to root
                 if command.param.clone().unwrap_or(" ".to_string()) == "/" {
                     println!("Returned to root.");
@@ -216,15 +234,18 @@ fn build_file_sys_tree(commands: Vec<CommandInput>) -> Tree<Folder> {
                 // check if folder exists, if it doesn't, add to tree
                 for child in file_sys.get(curr_node).unwrap().children() {
                     if command.param == Some(child.data().name.clone()) {
-                        println!("Found folder requested for cd -> {}", command.param.clone().unwrap_or("".to_string()));
+                        println!(
+                            "Found folder requested for cd -> {}",
+                            command.param.clone().unwrap_or("".to_string())
+                        );
                     }
                 }
-                println!("Could NOT find folder requested for cd -> {}", command.param.unwrap_or("".to_string()));
-                
-            },
-            ConsoleCommand::Ls => {
-
-            },
+                println!(
+                    "Could NOT find folder requested for cd -> {}",
+                    command.param.unwrap_or("".to_string())
+                );
+            }
+            ConsoleCommand::Ls => {}
             ConsoleCommand::Unknown => {}
         }
     }
