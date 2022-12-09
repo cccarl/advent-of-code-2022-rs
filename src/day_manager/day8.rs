@@ -66,7 +66,7 @@ pub fn day_8_main() {
     let res = count_visible_trees_and_vis_score(forest);
     println!("The results of parts 1 and 2 are: {:?}", res);
 
-    // part 2 was indeed doable by adding features to part 1, I had to add structs to the visibility to keep track of the needed trees and add 
+    // part 2 was indeed doable by adding features to part 1, I had to add structs to the visibility to keep track of the needed trees and add
     // a method to calculate the score, neat
 }
 

@@ -1,13 +1,11 @@
 use core::time;
-use std::fs;
 use std::collections::HashSet;
+use std::fs;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 struct Rope {
-    head_x: i32,
-    head_y: i32,
-    tail_x: i32,
-    tail_y: i32,
+    knots_x: Vec<i32>,
+    knots_y: Vec<i32>,
 }
 
 #[derive(Debug)]
@@ -25,92 +23,98 @@ struct Instruction {
 }
 
 impl Rope {
-
+    // move head to a direction, them move every other knot of the rope accordingly
     fn move_head(&mut self, mov: &RopeMovement, ammount: u32) {
-
         for _ in 0..ammount {
             match mov {
                 RopeMovement::Up => {
-                    self.head_y += 1;
-                    let (dist_x, dist_y) = self.calc_distance();
-                    // cover 3 possible positions where the tail should be moved
-                    if dist_y >= 2 && dist_x == -1 {
-                        self.tail_x -= 1;
-                        self.tail_y += 1;
+                    // move head knot
+                    self.knots_y[0] += 1;
+
+                    // iterate over the knots to move them if they are too spearated
+                    for i in 0..self.knots_x.len() - 1 {
+                        if !self.move_tail(i) {
+                            break;
+                        }
                     }
-                    else if dist_y >= 2 && dist_x == 0 {
-                        self.tail_y += 1;
-                    }
-                    else if dist_y >= 2 && dist_x == 1 {
-                        self.tail_x += 1;
-                        self.tail_y += 1;
-                    }
-                    
-                },
+                }
                 RopeMovement::Down => {
-                    self.head_y -= 1;
-                    let (dist_x, dist_y) = self.calc_distance();
+                    self.knots_y[0] -= 1;
 
-                    if dist_y <= -2 && dist_x == -1 {
-                        self.tail_x -= 1;
-                        self.tail_y -= 1;
+                    for i in 0..self.knots_x.len() - 1 {
+                        if !self.move_tail(i) {
+                            break;
+                        }
                     }
-                    else if dist_y <= -2 && dist_x == 0 {
-                        self.tail_y -= 1;
-                    }
-                    else if dist_y <= -2 && dist_x == 1 {
-                        self.tail_x += 1;
-                        self.tail_y -= 1;
-                    }
-                },
+                }
                 RopeMovement::Left => {
-                    self.head_x -= 1;
-                    let (dist_x, dist_y) = self.calc_distance();
-                    
-                    if dist_x <= -2 && dist_y == -1 {
-                        self.tail_x -= 1;
-                        self.tail_y -= 1;
-                    }
-                    else if dist_x <= -2 && dist_y == 0 {
-                        self.tail_x -= 1;
-                    }
-                    else if dist_x <= -2 && dist_y == 1 {
-                        self.tail_x -= 1;
-                        self.tail_y += 1;
-                    }
-                },
-                RopeMovement::Right => {
-                    self.head_x += 1;
-                    let (dist_x, dist_y) = self.calc_distance();
+                    self.knots_x[0] -= 1;
 
-                    if dist_x >= 2 && dist_y == -1 {
-                        self.tail_x += 1;
-                        self.tail_y -= 1;
+                    for i in 0..self.knots_x.len() - 1 {
+                        if !self.move_tail(i) {
+                            break;
+                        }
                     }
-                    else if dist_x >= 2 && dist_y == 0 {
-                        self.tail_x += 1;
+                }
+                RopeMovement::Right => {
+                    self.knots_x[0] += 1;
+
+                    for i in 0..self.knots_x.len() - 1 {
+                        if !self.move_tail(i) {
+                            break;
+                        }
                     }
-                    else if dist_x >= 2 && dist_y == 1 {
-                        self.tail_x += 1;
-                        self.tail_y += 1;
-                    }
-                },
+                }
             }
         }
-        
-
     }
 
-    // get the distance between the head and tail, separated in x and y
-    fn calc_distance(&self) -> (i32, i32) {
-        let dist_x = self.head_x - self.tail_x;
-        let dist_y = self.head_y - self.tail_y;
-        if dist_x > 2 || dist_x < -2 || dist_y > 2 || dist_y < -2 {
-            println!("WARNING: This dist should not be possible: {dist_x} {dist_y}");
-            println!("Full struct: {:?}", self);
-            std::thread::sleep(time::Duration::from_millis(10000));
+    // called by move_head to properly move the tail after a head movement, calling it manually should have no effect
+    // return a bool indicating if there was movement or not
+    fn move_tail(&mut self, i: usize) -> bool {
+        let mut movement = true;
+        let (dist_x, dist_y) = calc_distance(
+            (self.knots_x[i], self.knots_y[i]),
+            (self.knots_x[i + 1], self.knots_y[i + 1]),
+        );
+        // cover every possible movement in one big function, part 2 added the case of both distances being 2 (it was a pain to find that out)
+        if (dist_y >= 2 && dist_x == -1)
+            || (dist_x == -2 && dist_y == 2)
+            || (dist_x <= -2 && dist_y == 1)
+        {
+            self.knots_x[i + 1] -= 1;
+            self.knots_y[i + 1] += 1;
+        } else if (dist_y <= -2 && dist_x == 1)
+            || (dist_x >= 2 && dist_y == -1)
+            || (dist_x == 2 && dist_y == -2)
+        {
+            self.knots_x[i + 1] += 1;
+            self.knots_y[i + 1] -= 1;
+        } else if (dist_y >= 2 && dist_x == 1)
+            || (dist_x >= 2 && dist_y == 1)
+            || (dist_x == 2 && dist_y == 2)
+        {
+            self.knots_x[i + 1] += 1;
+            self.knots_y[i + 1] += 1;
+        } else if (dist_y <= -2 && dist_x == -1)
+            || (dist_x <= -2 && dist_y == -1)
+            || (dist_x == -2 && dist_y == -2)
+        {
+            self.knots_x[i + 1] -= 1;
+            self.knots_y[i + 1] -= 1;
+        } else if dist_y >= 2 && dist_x == 0 {
+            self.knots_y[i + 1] += 1;
+        } else if dist_y <= -2 && dist_x == 0 {
+            self.knots_y[i + 1] -= 1;
+        } else if dist_x <= -2 && dist_y == 0 {
+            self.knots_x[i + 1] -= 1;
+        } else if dist_x >= 2 && dist_y == 0 {
+            self.knots_x[i + 1] += 1;
+        } else {
+            movement = false;
         }
-        return ((dist_x),  (dist_y));
+
+        movement
     }
 }
 
@@ -119,19 +123,18 @@ pub fn day_9_main() {
     let file_path = "inputs/day_9_rope.txt";
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     println!("\n{}\n", input);
-    
+
     // so we now have a rope with a head and tail, the tail will follow the head as long as there are 2 spaces separating them. in a grid.
     // the square surrounding the head counts as 1 space, the tail will move 1 space to keep up, if that's not enough, it moves diagonally
 
+    // part 2 edit: refaftor rope into being 2 vecs of x and y to make rope length arbitrary
     let mut test_rope = Rope {
-        head_x: 0,
-        head_y: 0,
-        tail_x: -1,
-        tail_y: -1,
+        knots_x: vec![0, -1, -2],
+        knots_y: vec![0, -1, -1],
     };
 
     println!("Test Rope: {:?}", test_rope);
-    test_rope.move_head(&RopeMovement::Right, 4);
+    test_rope.move_head(&RopeMovement::Right, 1);
     println!("Test rope after moving 1 up: {:?}", test_rope);
 
     let mut hash_set_test = HashSet::new();
@@ -155,7 +158,7 @@ pub fn day_9_main() {
                     println!("Could not recognize character in line: {}", ins_str);
                     None
                 }
-            }
+            },
             None => {
                 println!("This line is empty somehow.");
                 None
@@ -163,25 +166,45 @@ pub fn day_9_main() {
         };
 
         ins_chars.next();
-        let quantity = ins_chars.collect::<String>().parse().expect(&format!("The 3rd+ char should be a number: {}", ins_str));
-        instructions.push( Instruction { movement: movement.unwrap(), quantity: quantity });
+        let quantity = ins_chars
+            .collect::<String>()
+            .parse()
+            .expect(&format!("The 3rd+ char should be a number: {}", ins_str));
+        instructions.push(Instruction {
+            movement: movement.unwrap(),
+            quantity: quantity,
+        });
     }
 
     println!("{:?}", instructions);
 
     // PART 1: count how many spaces goes the TAIL through
+    // PART 2: same as before, BUT now the rope has 10 knots, this means that you move the head then a chain reaction occurs until the end of the rope
+    // refactoring the Rope struct and changing the move_head func to apply to every knot solves part 2 and any arbitrary length
     let mut tail_trail = HashSet::new();
-    let mut rope = Rope {head_x: 0, head_y: 0, tail_x: 0, tail_y: 0};
+    let rope_len = 10; // part1: 2, part2: 10
+    let mut rope = Rope {
+        knots_x: vec![0; rope_len],
+        knots_y: vec![0; rope_len],
+    };
     for inst in instructions {
         for _ in 0..inst.quantity {
-            // yea don't want to refactor, without this for i can't save the entire trail easily
+            // yea don't want to refactor the ammount param, without this 'for' instead of just using the param i can't save the entire trail easily
             rope.move_head(&inst.movement, 1);
-            tail_trail.insert((rope.tail_x, rope.tail_y));
+            tail_trail.insert((rope.knots_x[rope_len - 1], rope.knots_y[rope_len - 1]));
         }
-
     }
     println!("The final hashset is: {:?}", tail_trail);
     println!("The ammount of trails is: {}", tail_trail.len());
-    
-    
+}
+
+// get the distance between the head and tail, separated in x and y
+fn calc_distance(head: (i32, i32), tail: (i32, i32)) -> (i32, i32) {
+    let dist_x = head.0 - tail.0;
+    let dist_y = head.1 - tail.1;
+    if dist_x > 2 || dist_x < -2 || dist_y > 2 || dist_y < -2 {
+        println!("WARNING: This dist should not be possible: {dist_x} {dist_y}");
+        std::thread::sleep(time::Duration::from_millis(10000));
+    }
+    return ((dist_x), (dist_y));
 }
