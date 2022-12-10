@@ -20,7 +20,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
-mod day7;
+//mod day7;
 mod day8;
 mod day9;
 
@@ -34,7 +34,7 @@ pub fn execute_day(day: u32) {
         4 => day4::day_4_main(),
         5 => day5::day_5_main(),
         6 => day6::day_6_main(),
-        7 => day7::day_7_main(),
+        //7 => day7::day_7_main(),
         8 => day8::day_8_main(),
         9 => day9::day_9_main(),
         10 => day10::day_10_main(),
