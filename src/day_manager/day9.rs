@@ -118,9 +118,12 @@ impl Rope {
     }
 }
 
-pub fn day_9_main() {
+pub fn day_9_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/9
-    let file_path = "inputs/day_9_rope.txt";
+    let file_path = match input_file {
+        None => "inputs/day_9_rope.txt".to_owned(),
+        Some(file) => file,
+    };
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     println!("\n{}\n", input);
 

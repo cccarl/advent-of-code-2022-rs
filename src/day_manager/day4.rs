@@ -5,9 +5,12 @@ struct Cleanup {
     finish: i32,
 }
 
-pub fn day_4_main() {
-    // https://adventofcode.com/2022/day/3
-    let file_path = "inputs/day_4_cleanup.txt";
+pub fn day_4_main(input_file: Option<String>) {
+    // https://adventofcode.com/2022/day/4
+    let file_path = match input_file {
+        None => "inputs/day_4_cleanup.txt".to_owned(),
+        Some(file) => file,
+    };
     let cleanup_raw = fs::read_to_string(file_path).expect("Could not read or find file");
 
     let mut full_overlap_count = 0;

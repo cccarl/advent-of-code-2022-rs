@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs;
 
-pub fn day_3_main() {
+pub fn day_3_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/3
 
     /*
@@ -24,7 +24,10 @@ pub fn day_3_main() {
     those 3 lines
     */
 
-    let file_path = "inputs/day_3_rucksacks.txt";
+    let file_path = match input_file {
+        None => "inputs/day_3_rucksacks.txt".to_owned(),
+        Some(file) => file,
+    };
     let sacks_raw = fs::read_to_string(file_path).expect("Could not read or find file");
 
     run_part_1(sacks_raw.clone());

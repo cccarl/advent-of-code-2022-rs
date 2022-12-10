@@ -29,9 +29,12 @@ enum ConsoleCommand {
     Unknown,
 }
 
-pub fn day_7_main() {
+pub fn day_7_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/7
-    let file_path = "inputs/day_7_demo.txt";
+    let file_path = match input_file {
+        None => "inputs/day_7_demo.txt".to_owned(),
+        Some(file) => file,
+    };
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     //println!("\n{}\n", input);
 

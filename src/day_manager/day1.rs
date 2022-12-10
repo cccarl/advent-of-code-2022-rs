@@ -1,8 +1,11 @@
 use std::fs;
 
-pub fn day_1_main() {
+pub fn day_1_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/1
-    let file_path = "inputs/day_1_calories.txt";
+    let file_path = match input_file {
+        None => "inputs/day_1_calories.txt".to_owned(),
+        Some(file) => file,
+    };
     println!("File to open: {}", file_path);
 
     // read file

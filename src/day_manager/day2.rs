@@ -121,9 +121,12 @@ impl Game {
     }
 }
 
-pub fn day_2_main() {
+pub fn day_2_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/2
-    let file_path = "inputs/day_2_strategy.txt";
+    let file_path = match input_file {
+        None => "inputs/day_2_strategy.txt".to_owned(),
+        Some(file) => file,
+    };
 
     let strategy_input = fs::read_to_string(file_path).expect("Could not read or find file");
 

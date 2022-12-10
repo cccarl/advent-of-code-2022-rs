@@ -6,9 +6,12 @@ enum Instruction {
     Noop,
 }
 
-pub fn day_10_main() {
+pub fn day_10_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/10
-    let file_path = "inputs/day_10_cpu.txt";
+    let file_path = match input_file {
+        None => "inputs/day_10_cpu.txt".to_owned(),
+        Some(file) => file,
+    };
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     println!("\n{}\n", input);
 
@@ -94,22 +97,22 @@ fn print_pixel(curr_pixel: i32, reg_x: i32) {
             || curr_pixel % 40 + 40 == reg_x + 1
             || curr_pixel % 40 + 40 == reg_x + 2)
     {
-        print!("█ ");
+        print!("██");
     } else if (curr_pixel % 40 == 0)
         && (curr_pixel % 40 + 40 != reg_x
             || curr_pixel % 40 + 40 != reg_x + 1
             || curr_pixel % 40 + 40 != reg_x + 2)
     {
-        print!(". ");
+        print!("  ");
     }
     // non jank part
     else if curr_pixel % 40 == reg_x
         || curr_pixel % 40 == reg_x + 1
         || curr_pixel % 40 == reg_x + 2
     {
-        print!("█ ");
+        print!("██");
     } else {
-        print!(". ");
+        print!("  ");
     }
     if curr_pixel % 40 == 0 {
         println!("");

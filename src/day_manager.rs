@@ -24,35 +24,35 @@ mod day6;
 mod day8;
 mod day9;
 
-pub fn execute_day(day: u32) {
+pub fn execute_day(day: u32, input_file: Option<String>) {
     println!("\n***Running day: {}***\n", day);
 
     match day {
-        1 => day1::day_1_main(),
-        2 => day2::day_2_main(),
-        3 => day3::day_3_main(),
-        4 => day4::day_4_main(),
-        5 => day5::day_5_main(),
-        6 => day6::day_6_main(),
-        //7 => day7::day_7_main(),
-        8 => day8::day_8_main(),
-        9 => day9::day_9_main(),
-        10 => day10::day_10_main(),
-        11 => day11::day_11_main(),
-        12 => day12::day_12_main(),
-        13 => day13::day_13_main(),
-        14 => day14::day_14_main(),
-        15 => day15::day_15_main(),
-        16 => day16::day_16_main(),
-        17 => day17::day_17_main(),
-        18 => day18::day_18_main(),
-        19 => day19::day_19_main(),
-        20 => day20::day_20_main(),
-        21 => day21::day_21_main(),
-        22 => day22::day_22_main(),
-        23 => day23::day_23_main(),
-        24 => day24::day_24_main(),
-        25 => day25::day_25_main(),
+        1 => day1::day_1_main(input_file),
+        2 => day2::day_2_main(input_file),
+        3 => day3::day_3_main(input_file),
+        4 => day4::day_4_main(input_file),
+        5 => day5::day_5_main(input_file),
+        6 => day6::day_6_main(input_file),
+        //7 => day7::day_7_main(input_file),
+        8 => day8::day_8_main(input_file),
+        9 => day9::day_9_main(input_file),
+        10 => day10::day_10_main(input_file),
+        11 => day11::day_11_main(input_file),
+        12 => day12::day_12_main(input_file),
+        13 => day13::day_13_main(input_file),
+        14 => day14::day_14_main(input_file),
+        15 => day15::day_15_main(input_file),
+        16 => day16::day_16_main(input_file),
+        17 => day17::day_17_main(input_file),
+        18 => day18::day_18_main(input_file),
+        19 => day19::day_19_main(input_file),
+        20 => day20::day_20_main(input_file),
+        21 => day21::day_21_main(input_file),
+        22 => day22::day_22_main(input_file),
+        23 => day23::day_23_main(input_file),
+        24 => day24::day_24_main(input_file),
+        25 => day25::day_25_main(input_file),
         _ => {
             println!(
                 "This day doesn't exist or doesn't have an exercise assigned! Ending program..."

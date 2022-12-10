@@ -1,9 +1,12 @@
 use itertools::Itertools;
 use std::{collections::VecDeque, fs};
 
-pub fn day_6_main() {
+pub fn day_6_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/6
-    let file_path = "inputs/day_6_data_stream.txt";
+    let file_path = match input_file {
+        None => "inputs/day_6_data_stream.txt".to_owned(),
+        Some(file) => file,
+    };
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
 
     // PART 1

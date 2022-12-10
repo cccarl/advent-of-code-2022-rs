@@ -48,9 +48,12 @@ impl Visibility {
     }
 }
 
-pub fn day_8_main() {
+pub fn day_8_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/8
-    let file_path = "inputs/day_8_trees.txt";
+    let file_path = match input_file {
+        None => "inputs/day_8_trees.txt".to_owned(),
+        Some(file) => file,
+    };
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     println!("\n{}\n", input);
 

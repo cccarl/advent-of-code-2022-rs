@@ -7,9 +7,12 @@ struct Instruction {
     to: i32,
 }
 
-pub fn day_5_main() {
+pub fn day_5_main(input_file: Option<String>) {
     // https://adventofcode.com/2022/day/5
-    let file_path = "inputs/day_5_cranes.txt";
+    let file_path = match input_file {
+        None => "inputs/day_5_cranes.txt".to_owned(),
+        Some(file) => file,
+    };
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
     //println!("\n{}\n", input);
 
