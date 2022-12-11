@@ -1,4 +1,6 @@
 use std::fs;
+use std::thread::sleep;
+use std::time::Duration;
 
 #[derive(Debug)]
 enum Instruction {
@@ -13,7 +15,7 @@ pub fn day_10_main(input_file: Option<String>) {
         Some(file) => file,
     };
     let input = fs::read_to_string(file_path).expect("Could not read or find file.");
-    println!("\n{}\n", input);
+    //println!("\n{}\n", input);
 
     // save the program
     let mut program: Vec<Instruction> = vec![];
@@ -36,9 +38,9 @@ pub fn day_10_main(input_file: Option<String>) {
     // addx changes register X
     // PART 1: calc sum of signal strengths in cycles 20, 60, 100, 140, 180, 220
     // signal strength: cycle number * value in register X
-    let mut reg_x = 1; // starts on 1
-    let mut cycle = 0;
-    let mut signal_sum = 0;
+    let mut reg_x: i64 = 1; // starts on 1
+    let mut cycle: i64 = 0;
+    let mut signal_sum: i64 = 0;
     for instruction in &program {
         cycle += 1;
         if cycle % 40 == 20 {
@@ -50,7 +52,7 @@ pub fn day_10_main(input_file: Option<String>) {
                 if cycle % 40 == 20 {
                     signal_sum += calc_signal_strength(cycle, reg_x);
                 }
-                reg_x += c;
+                reg_x += i64::from(*c);
             }
             Instruction::Noop => { /* lol like a real noop */ }
         }
@@ -69,24 +71,53 @@ pub fn day_10_main(input_file: Option<String>) {
     let mut reg_x = 1; // starts on 1
     let mut cycle = 1;
     println!("Racing the beam:");
+    let mut vblank = 0; // 16 cycles of stalling when a frame is drawn
     for instruction in &program {
+        // bad apple compatibility, there are 16 cycles of nothing after a frame is drawn
+        // shoutouts https://gist.github.com/RocketRace/3dd92cfc4ddfa614bca2de1b317e4406
+        if vblank == 16 {
+            vblank = 0;
+            cycle = 1;
+
+            print!("{esc}c", esc = 27 as char);
+            sleep(Duration::from_millis(10));
+        }
+
         match instruction {
-            Instruction::Addx(c) => {
-                print_pixel(cycle, reg_x);
+            Instruction::Addx(n) => {
+                // cycle 1
+                if cycle > 240 {
+                    //println!("Stalling... cycle {}, stalls {}", cycle, vblank);
+                    vblank += 1;
+                } else {
+                    print_pixel(cycle, reg_x);
+                }
                 cycle += 1;
-                print_pixel(cycle, reg_x);
+
+                // cycle 2
+                if cycle > 240 {
+                    //println!("Stalling... cycle {}, stalls {}", cycle, vblank);
+                    vblank += 1;
+                } else {
+                    print_pixel(cycle, reg_x);
+                }
+                reg_x += *n;
                 cycle += 1;
-                reg_x += c;
             }
             Instruction::Noop => {
-                print_pixel(cycle, reg_x);
+                if cycle > 240 {
+                    //println!("Stalling... cycle {}, stalls {}", cycle, vblank);
+                    vblank += 1;
+                } else {
+                    print_pixel(cycle, reg_x);
+                }
                 cycle += 1;
             }
         }
     }
 }
 
-fn calc_signal_strength(cycle: i32, reg_x: i32) -> i32 {
+fn calc_signal_strength(cycle: i64, reg_x: i64) -> i64 {
     return cycle * reg_x;
 }
 
