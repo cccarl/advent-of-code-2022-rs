@@ -20,12 +20,15 @@ pub fn day_13_main(input_file: Option<String>) {
     
     println!("-------------------------Test start---------------");
 
-    let test_str = "[[1],[2,3,4]]";
-    let test_str2 = "[[4,4],4,4,4]";
-
+    let test_str = "[[0,[[]]],[1],[2]";
+    let test_str2 = "[[2,[]]]";
     println!("Parsing:\n{}\n{}\n", test_str, test_str2);
-    println!("\nstr 1 parsed: {:?}", parse_signal_side(test_str.strip_prefix("[").unwrap().strip_suffix("]").unwrap()));
-    println!("\nstr 2 parsed: {:?}", parse_signal_side(test_str2.strip_prefix("[").unwrap().strip_suffix("]").unwrap()));
+
+    let test_str_parsed = parse_signal_side(test_str.strip_prefix("[").unwrap().strip_suffix("]").unwrap());
+    let test_str_parsed2 = parse_signal_side(test_str2.strip_prefix("[").unwrap().strip_suffix("]").unwrap());
+
+    println!("\nstr 1 parsed: {:?}", test_str_parsed);
+    println!("\nstr 2 parsed: {:?}", test_str_parsed2);
 
     println!("-------------------------Test end----------------");
 /* 
@@ -53,8 +56,10 @@ fn parse_signal_side(signal: &str) -> Vec<SignalElement> {
 
         match char {
             '[' => {
+                println!("\nBRACKET COUNT!!!!!!!: {} -- slice left: {}", bracket_count, &signal[pos..]);
                 if bracket_count == 0 {
-                    items.push(deconstruct_signal_list(&signal[pos..], &mut vec![], 0));
+                    println!("\nNested list detected! starting recursion:");
+                    items.push(deconstruct_signal_list(&signal[pos..], &mut vec![], 0).unwrap());
                 }
                 bracket_count += 1;
             },
@@ -78,42 +83,74 @@ fn parse_signal_side(signal: &str) -> Vec<SignalElement> {
 
 // i can't believe this worked
 // gets a list of signal types in a string and recursively builds it into the proper SignalElement::List(_) enum using recursion
-// TODO: change return to Option<SignalElement> to be able to return None and avoid the double nested lists
-fn deconstruct_signal_list(partial_signal: &str, final_vec: &mut Vec<SignalElement>, bracket_count: usize) -> SignalElement {
 
 
-    println!("Vec: {:?} -- Current slice: {} -- Bracket count: {}", final_vec, partial_signal, bracket_count);
+// TODO: change return to Option<SignalElement> to be able to return None and avoid the double nested lists (i think)
+
+
+fn deconstruct_signal_list(partial_signal: &str, final_vec: &mut Vec<SignalElement>, bracket_count: usize) -> Option<SignalElement> {
+
+
+    //println!("Current slice: {} -- Bracket count: {}", partial_signal, bracket_count);
+    println!("Received: {:?} with slice {}", final_vec, partial_signal);
     match partial_signal.chars().next() {
         Some(c) => {
             match c {
                 '[' => {
-                    final_vec.push(deconstruct_signal_list(&partial_signal[1..], &mut vec![], bracket_count + 1));
-                    return SignalElement::List(final_vec.to_vec());
-                },
-                ']' => {
-                    if bracket_count != 1 {
-                        deconstruct_signal_list(&partial_signal[1..], final_vec, bracket_count - 1);
-                        return SignalElement::List(final_vec.to_vec());
+                    
+                    if let Some(signal_part) = deconstruct_signal_list(&partial_signal[1..], &mut vec![], bracket_count + 1) {
+                        
+                        println!("bracket count: {}", bracket_count);
+                        println!("Pushing: {:?}", signal_part);
+                        final_vec.push(signal_part);
+                    }
+
+                    println!("Returning [: {:?}", SignalElement::List( final_vec.to_vec()));
+                    if final_vec.is_empty() {
+                        return Some(SignalElement::List(vec![]));
+                    }
+                    else if bracket_count != 0 {
+                        return Some(SignalElement::List( final_vec.to_vec()));
                     }
                     else {
-                        // this should not happen question mark?
-                        return SignalElement::Number(10000);
+                        println!("VEC WHEN BCOUNT ISNT 0: {:?}", final_vec);
+                        return Some(final_vec.to_vec()[0].clone());
                     }
+                },
+                ']' => {
+                    println!("bracket count: {}", bracket_count);
+                    println!("VEC IN ]: {:?}", final_vec);
+                    if bracket_count != 1 {
+                        deconstruct_signal_list(&partial_signal[1..], final_vec, bracket_count - 1);
+                        println!("Retuning from ]");
+                        return None;
+                    }
+                    else {
+                        println!("FINISHED RECURSION!!!!!!!!");
+                        return None;
+                    }
+
                     
                 },
                 ',' => {
                     deconstruct_signal_list(&partial_signal[1..], final_vec, bracket_count);
-                    return SignalElement::List(final_vec.to_vec());
+                    println!("Returning ,: {:?}", SignalElement::List(final_vec.to_vec()));
+                    return Some(SignalElement::List(final_vec.to_vec()));
                 },
                 _ => {
                     final_vec.push(SignalElement::Number(c.to_string().parse().expect(&format!("Could not parase number in input: {}", c))));
                     deconstruct_signal_list(&partial_signal[1..], final_vec, bracket_count);
-                    return SignalElement::List(final_vec.to_vec());
+                    println!("Returning {}: {:?}", c, SignalElement::List(final_vec.to_vec()));
+                    return Some(SignalElement::List(final_vec.to_vec()));
                 }
             }
 
         },
-        None => return SignalElement::Number(420),
+        None => {
+            // this should not run ever with a good input
+            println!("THIS RUNS?????");
+            return None
+        },
     }
 
 }
